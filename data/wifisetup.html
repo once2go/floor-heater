@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta name='viewport' content='width=device-width, initial-scale=1.0'/>
+	<meta charset='utf-8'>
+	<style>
+	body {font-size:140%; background: #E5E5E9;} 
+	#main {display: table; margin: auto;  padding: 0 10px 0 10px; } 
+	h2 {text-align:center; } 
+	.button {padding:10px 100px 10px 100px; background-color: #00B7C7; font-size: 110%; margin-top: 5%;border-radius: 15px; color: #F4F4F7;}
+</style>
+<title>&#11438; Setup wifi</title>
+<script> 
+	function reload() {
+		location.reload(true);
+	}
+
+	function submit() {
+		var data = new FormData();
+    	data.append('ssid', document.getElementById('ssid').value);
+    	data.append('password', document.getElementById('password').value);
+    	data.append('pin', document.getElementById('pin').value);
+		var xhttp = new XMLHttpRequest();
+		xhttp.onreadystatechange = function() {
+			if (this.readyState == 4) {
+				if (this.status == 200) {
+					setTimeout(reload, 20000);
+				} else {
+					alert(this.responseText);
+				}                  
+			}
+		};
+		xhttp.open("POST", "config", true);
+		xhttp.send(data);
+	}
+</script>
+</head>
+<body style="text-align: center;">
+	<h3 style="padding: 0px; margin-bottom: 0px;">Wi-Fi AP Name:</h3>
+	<input type="text" id="ssid" name="ssid" class="h2">
+	<h3 style="padding: 0px; margin-bottom: 0px;">Wi-Fi Password:</h3>
+	<input type="password" id="password" name="password" class="h2"><br>
+	<h3 style="padding: 0px; margin-bottom: 0px;">Pin code(4 digits):</h3>
+	<input type="digits" id="pin" name="pin" class="h2"><br>
+	<button class="button" onclick="submit()">Save</button>
+</body>
+</html>

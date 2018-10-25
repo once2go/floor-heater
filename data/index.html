@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html>
+<head>
+ <meta name='viewport' content='width=device-width, initial-scale=1.0'/>
+ <meta charset='utf-8'>
+ <style>
+ body {font-size:140%; background: #E5E5E9;} 
+ #main {display: table; margin: auto;  padding: 0 10px 0 10px; } 
+ h2 {text-align:center; } 
+ .button { padding:10px 10px 10px 10px; width:100%; background-color: #00B7C7; font-size: 120%; margin-bottom: 20px;border-radius: 15px; color: #F4F4F7;}
+</style>
+<title>&#9925; Floor Heater </title>
+<script>
+  function getCookie(name) {
+    var value = "; " + document.cookie;
+    var parts = value.split("; " + name + "=");
+    if (parts.length == 2) return parts.pop().split(";").shift();
+  }
+
+  window.onload = function() {
+   loadState();
+ };
+
+ function login() {
+  var pincode = prompt("Enter pincode:", "");
+  var data = new FormData();
+  data.append('pin', pincode);
+  var xhttp = new XMLHttpRequest();
+  xhttp.onreadystatechange = function() {
+    if (this.readyState == 4) {
+     if (this.status == 200) {
+      document.cookie = "key=" + this.responseText;
+    } else {
+      alert("Invalid pin code. Try again");
+    }                  
+  }
+};
+xhttp.open("POST", "login", true);
+xhttp.send(data);
+}
+
+function loadState(){
+  var data = new FormData();
+  data.append('key', getCookie("key"));
+  var xhttp = new XMLHttpRequest();
+  var xhttp = new XMLHttpRequest();
+  xhttp.onreadystatechange = function() {
+    if (this.readyState == 4 && this.status == 200) {
+
+      var response = JSON.parse(this.responseText); 
+      for (info in response.state) {
+        switch(response.state[info].name){
+          case "line1" :
+          document.getElementById("zone1").value = response.state[info].state;
+          document.getElementById("zone1").style.color = response.state[info].state == 1 ? "#fed766" :"#F4F4F7" ;
+          break;
+          case "line2" :
+          document.getElementById("zone2").value = response.state[info].state; 
+          document.getElementById("zone2").style.color = response.state[info].state == 1 ? "#fed766" :"#F4F4F7" ;
+          break;
+          case "line3" :
+          document.getElementById("zone3").value = response.state[info].state; 
+          document.getElementById("zone3").style.color = response.state[info].state == 1 ? "#fed766" :"#F4F4F7" ;
+          break;
+          case "line4" : 
+          document.getElementById("zone4").value = response.state[info].state;
+          document.getElementById("zone4").style.color = response.state[info].state == 1 ? "#fed766" :"#F4F4F7" ;
+          break;
+          case "temperature": 
+          var t = response.state[info].state;
+          document.getElementById('temperature-value').innerHTML=t.substring(0,4) + "*C &#127777;";
+          break;
+          case "ip_addr": 
+          document.getElementById('device-ip').innerHTML = "IP:" + response.state[info].state ;
+          break;
+          case "rssi": 
+          document.getElementById('device-rssi').innerHTML = "RSSI:" + response.state[info].state;
+          break;
+        }
+      }
+    }
+  };
+  xhttp.open("POST", "getstate", true);
+  xhttp.send(data); 
+}
+var ee_ctr = 0;
+function enableBedroomButton() {
+  if (ee_ctr >=8) {
+      document.getElementById("zone4").style.display = "inline"; 
+      ee_ctr = 0;
+  }
+  ee_ctr++;
+}
+
+function changeState(zone) {
+  var data = new FormData();
+  data.append("key", getCookie("key"));
+  switch (zone) {
+    case 1:
+    data.append('line1', document.getElementById("zone1").value == 0 ? 1 : 0);
+    break;
+    case 2:
+    data.append('line2', document.getElementById("zone2").value == 0 ? 1 : 0);
+    break;
+    case 3:
+    data.append('line3', document.getElementById("zone3").value == 0 ? 1 : 0);
+    break;
+    case 4:
+    data.append('line4', document.getElementById("zone4").value == 0 ? 1 : 0);
+    break;
+    case 100:
+    data.append('line1', 0);
+    data.append('line2', 0);
+    data.append('line3', 0);
+    data.append('line4', 0);
+    break;
+  }
+  var xhttp = new XMLHttpRequest();
+  xhttp.onreadystatechange = function() {
+    if (this.readyState == 4) {
+     if (this.status == 200) {
+       loadState();
+     } else if (this.status == 401){
+      login();
+    }                  
+  }
+};
+xhttp.open("POST", "setstate", true);
+xhttp.send(data);
+}
+</script>
+</head>
+<body>
+  <button style="opacity:0.0;" onclick="enableBedroomButton()">Easter egg: Open bedroom</button>
+  <div id='main'> 
+  	<h3 style="text-align: center; color: #FF444F;">Temperature in ctrl block:</h3>
+  	<h3  id="temperature-value" style="text-align: center; color: #FF444F;">-- &#127777;</h3>
+    <h4  id="device-ip" style="text-align: center;">0.0.0.0</h3>
+    <h4  id="device-rssi" style="text-align: center;">RSSI: -0.0</h3>
+  	<button class="button" id="zone1" onclick="changeState(1)">Living room zone 1</button>
+  	<button class="button" id="zone2" onclick="changeState(2)">Living room zone 2</button>
+  	<button class="button" id="zone3" onclick="changeState(3)">Living room zone 3</button>
+  	<button class="button" id="zone4" onclick="changeState(4)" style="display: none;">Bedroom</button>
+  	<button class="button" style="background-color: #FF444F; margin-top: 10%;" id="zone4" onclick="changeState(100)">Turn Off All</button>
+  </div>
+</body>
+</html>
